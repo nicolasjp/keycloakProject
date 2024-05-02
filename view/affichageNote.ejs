@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<title>Keycloak Example</title>
+        <style>
+            form {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+            }
+    
+            div {
+                margin-right: 20px;
+            }
+            .centrer-colonne {
+                text-align: center;
+            }
+            .center-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 25px; /* Ajustez la marge selon vos besoins */
+            }
+        </style>
+        <script>
+            var tableauOriginal; // Stocker le tableau original lors du chargement initial
+
+            document.addEventListener('DOMContentLoaded', function () {
+                tableauOriginal = document.getElementById('tableauNotes').innerHTML;
+                const tableauNotes = document.getElementById('tableauNotes');
+                const boutonEnvoyer = document.getElementById('boutonEnvoyer');
+        
+                boutonEnvoyer.addEventListener('click', function () {
+                    // console.log("entry");
+                    // Récupérer la valeur de l'attribut data-ue du bouton
+                    const valeur = boutonEnvoyer.getAttribute('data-valeur');
+                    console.log(valeur)
+                    
+                    // Récupérer les valeurs des champs texte
+                    const champ1 = valeur
+                    const champ2 = document.getElementById('numetu').value;
+                    const champ3 = document.getElementById('note').value;
+                    const champ4 = "❌"
+
+                    if (champ2.trim() === '' || champ3.trim() === '') {
+                        // Afficher un message ou effectuer une action appropriée
+                        console.log("Les champs ne peuvent pas être vides. L'ajout est annulé.");
+                        return; // Arrêter l'exécution de la fonction
+                    }
+
+                    if (!/^\d+$/.test(champ2) || !/^\d+$/.test(champ3)) {
+                        console.log("Les champs doivent contenir uniquement des chiffres. L'ajout est annulé.");
+                        return;
+                    }
+
+                    const note = parseInt(champ3, 10);
+                    if (isNaN(note) || note < 0 || note > 20) {
+                        console.log("La note doit être un nombre entre 0 et 20. L'ajout est annulé.");
+                        return;
+                    }
+
+                    // Envoi des données au serveur
+                    fetch('/ajouterNote', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ue: valeur,
+                            numero_etudiant: champ2,
+                            note: champ3,
+                            validation: champ4
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Réponse du serveur :', data.message);
+                        // Mettez à jour votre interface utilisateur si nécessaire
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de l\'envoi des données au serveur:', error);
+                    });
+                    
+                    // Créer une nouvelle ligne pour le tableau avec la valeur
+                    const nouvelleLigne = document.createElement('tr');
+                    nouvelleLigne.innerHTML = `
+                        <td>${champ1}</td>
+                        <td>${champ2}</td>
+                        <td>${champ3}</td>
+                        <td class="centrer-colonne">${champ4}</td>
+                    `;
+        
+                    // Ajouter la nouvelle ligne au tableau
+                    tableauNotes.querySelector('tbody').appendChild(nouvelleLigne);
+        
+                    // Effacer les champs texte après l'ajout
+                    document.getElementById('numetu').value = '';
+                    document.getElementById('note').value = '';
+                });
+
+            });
+
+            function filtrerTableau() {
+                // Récupérer la valeur du champ de filtre
+                var filtreValeur = document.getElementById('filtreColonne').value.toUpperCase();
+
+                // Récupérer le tableau et les lignes
+                var tableau = document.getElementById('tableauNotes');
+                var lignes = tableau.getElementsByTagName('tr');
+
+                // Parcourir les lignes et afficher/masquer en fonction du filtre
+                for (var i = 0; i < lignes.length; i++) {
+                    var colonneFiltre = lignes[i].getElementsByTagName('td')[0]; // Changer l'indice selon la colonne à filtrer
+
+                    if (colonneFiltre) {
+                        var texteColonne = colonneFiltre.textContent || colonneFiltre.innerText;
+                        if (texteColonne.toUpperCase().indexOf(filtreValeur) > -1) {
+                            lignes[i].style.display = '';
+                        } else {
+                            lignes[i].style.display = 'none';
+                        }
+                    }
+                }
+                document.getElementById('filtreColonne').value = '';
+            }
+            
+            function reinitialiserTableau() {
+                // Récupérer le tableau
+                var tableau = document.getElementById('tableauNotes');
+
+                // Rétablir le tableau original
+                tableau.innerHTML = tableauOriginal;
+
+                document.getElementById('filtreColonne').value = '';
+            }
+
+            function retourPagePrecedente() {
+                // Utiliser l'API de navigation pour revenir à la page précédente
+                window.history.back();
+            }
+            </script>        
+	</head>
+    <body class="center-container">
+        <button onclick="retourPagePrecedente()">Accueil</button>
+        <h3>Session : <%= user.name %></h3>
+        <h3>Role : <%= user.role %></h3>
+        <%
+            if (user.role.includes('ResponsableIA') 
+                || user.role.includes('ResponsableCyber')
+                || user.role.includes('ResponsableManagement')
+                || user.role.includes('ChargeTDCyber')
+                || user.role.includes('ChargeTDIA')
+                || user.role.includes('ChargeTDManagement')) {
+                %>
+            <h2>Tableau de notes - <%= notes[0]["ue"] %></h2>
+            <h4>Ajouter une note :</h4>
+            <form>
+                <div>
+                    <label for="numetu">Numéro etudiant:</label>
+                    <input type="text" id="numetu" name="numetu">
+                </div>
+                <div>
+                    <label for="note">Note:</label>
+                    <input type="text" id="note" name="note">
+                </div>    
+                <div>
+                    <button id="boutonEnvoyer" type="button" data-valeur="<%= notes[0]["ue"] %>">Envoyer</button>
+                </div>
+            </form><br>
+        <% } else { %>
+            <h2>Tableau des notes</h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label for="filtreColonne">Filtrer par UE:</label>
+                <input type="text" id="filtreColonne" />
+                <button onclick="filtrerTableau()">Filtrer</button>
+                <button onclick="reinitialiserTableau()">Réinitialiser</button>
+            </div><br>
+        <% } %>
+
+
+        <table border="1" id="tableauNotes">
+            <thead>
+                <tr>
+                    <th>UE</th>
+                    <th>Numéro étudiant</th>
+                    <th>Note</th>
+                    <th>Validation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% notes.forEach(function(note, index) { %>
+                    <tr>
+                        <td><%= note.ue %></td>
+                        <td><%= note.numero_etudiant %></td>
+                        <td><%= note.note %></td>
+                        <td class="centrer-colonne"><%= note.validation %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table><br>
+    </body>
+</html>
+

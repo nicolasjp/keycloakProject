@@ -1,0 +1,14 @@
+{
+    "realm": "projetkey",
+    "auth-server-url": "http://localhost:8082/",
+    "ssl-required": "external",
+    "resource": "my-application-project",
+    "verify-token-audience": true,
+    "credentials": {
+      "secret": "bDOU4Bu25M1VSclK1SXs2t54BHQ8mQeO"
+    },
+    "confidential-port": 0,
+    "policy-enforcer": {
+      "credentials": {}
+    }
+  }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<title>Keycloak Example</title>
+        <style>
+            form {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+            }
+    
+            div {
+                margin-right: 20px;
+            }
+            .centrer-colonne {
+                text-align: center;
+            }
+            .center-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 25px; /* Ajustez la marge selon vos besoins */
+            }
+        </style>
+        <script>
+            var tableauOriginal; // Stocker le tableau original lors du chargement initial
+
+            document.addEventListener('DOMContentLoaded', function () {
+                tableauOriginal = document.getElementById('tableauNotes').innerHTML;
+                const tableauNotes = document.getElementById('tableauNotes');
+                const boutonValider = document.getElementById('boutonValider');
+
+                boutonValider.addEventListener('click', function () {
+                    const valeur = boutonValider.getAttribute('data-valeur');
+                    // Parcourir toutes les lignes du tableau
+                    const lignes = tableauNotes.querySelectorAll('tbody tr');
+                    lignes.forEach(function (ligne) {
+                        // Mettre à jour la colonne de validation
+                        const colonneValidation = ligne.querySelector('td:last-child');
+                        colonneValidation.textContent = "✅";
+                    });
+
+                    fetch('/validerNotes', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            ue: valeur
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Réponse du serveur :', data.message);
+                        // Mettez à jour votre interface utilisateur si nécessaire
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la validation des notes sur le serveur:', error);
+                    });
+                });
+            });
+
+            function retourPagePrecedente() {
+                // Utiliser l'API de navigation pour revenir à la page précédente
+                window.history.back();
+            }
+            </script>        
+	</head>
+    <body class="center-container">
+        <button onclick="retourPagePrecedente()">Accueil</button>
+        <h3>Session : <%= user.name %></h3>
+        <h3>Role : <%= user.role %></h3>
+        <h2>Validation des notes - <%= notes[0]["ue"] %></h2>
+
+
+        <table border="1" id="tableauNotes">
+            <thead>
+                <tr>
+                    <th>UE</th>
+                    <th>Numéro étudiant</th>
+                    <th>Note</th>
+                    <th>Validation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% notes.forEach(function(note, index) { %>
+                    <tr>
+                        <td><%= note.ue %></td>
+                        <td><%= note.numero_etudiant %></td>
+                        <td><%= note.note %></td>
+                        <td class="centrer-colonne"><%= note.validation %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table><br>
+        <%
+            if (user.role.includes('ResponsableIA') 
+                || user.role.includes('ResponsableCyber')
+                || user.role.includes('ResponsableManagement')) {
+                %>
+                <button type="button" id="boutonValider" data-valeur="<%= notes[0]["ue"] %>">Valider les Notes</button>
+                <%
+            }
+        %>
+    </body>
+</html>
+
