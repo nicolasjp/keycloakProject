@@ -8,7 +8,7 @@ You're free to re-use my code to improve my Keycloak project and enable it to be
 
 ## Features 👀
 Here is the functionnality of my keycloak project :
-- You can log in under several different roles :
+- You can log in under different roles :
     - Student
     - Teacher
     - Teaching units manager
