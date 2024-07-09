@@ -2,7 +2,7 @@
 
 ## Description 
 The project aims to create a prototype using Keycloak and Node.js to manage grades at a university. 
-The project is based on the RBAC access control method. We will exploit the resources of the Keycloak documentation.\
+The project is based on the RBAC access control method. We will exploit the resources of the Keycloak documentation.
 The main objective is to implement the RBAC policy, without concentrating on the aesthetics of the site or the creation of a database.\ 
 You're free to re-use my code to improve my Keycloak project and enable it to be used via a website.
 
@@ -23,6 +23,6 @@ Here is the functionnality of my keycloak project :
     - https://youtu.be/hk8Ez1-QdBA
 
 ## Credits 🤝
-If you use my code again, please credit me.\
+If you reuse my code again, please credit me.\
 My github profile : https://github.com/nicolasjp. \
 My portfolio : https://nicolasjp.github.io/Portfolio/.
