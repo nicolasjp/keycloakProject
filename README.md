@@ -23,6 +23,6 @@ Here is the functionnality of my keycloak project :
     - https://youtu.be/hk8Ez1-QdBA
 
 ## Credits 🤝
-If you reuse my code again, please credit me.\
+If you re-use my code again, please credit me.\
 My github profile : https://github.com/nicolasjp. \
 My portfolio : https://nicolasjp.github.io/Portfolio/.
